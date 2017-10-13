@@ -107,6 +107,10 @@ class Environment(object):
                 warnings.warn(
                     "BUILDOUT_EGGS is deprecated. Please use "
                     "PLONE_ADDONS instead !!!", DeprecationWarning)
+        versions = [
+            "{0:s} =".format(re.findall(r"[^>=<]+", egg)[0])
+            for egg in eggs
+        ]
 
         zcml = self.env.get("PLONE_ZCML",
                self.env.get("ZCML", "")).strip().split()
@@ -132,7 +136,8 @@ class Environment(object):
         buildout = BUILDOUT_TEMPLATE.format(
             eggs="\n\t".join(eggs),
             zcml="\n\t".join(zcml),
-            develop="\n\t".join(develop)
+            develop="\n\t".join(develop),
+            versions="\n".join(versions)
         )
 
         with open(self.custom_conf, 'w') as cfile:
@@ -166,6 +171,9 @@ extends = develop.cfg
 develop += {develop}
 eggs += {eggs}
 zcml += {zcml}
+
+[versions]
+{versions}
 """
 
 def initialize():
